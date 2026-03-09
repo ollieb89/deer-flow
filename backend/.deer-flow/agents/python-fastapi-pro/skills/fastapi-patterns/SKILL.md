@@ -7,14 +7,29 @@ description: FastAPI-specific patterns for building high-performance async APIs.
 
 Build production-ready FastAPI applications with clean architecture and async patterns.
 
-## When to Use This Skill
+## Overview
 
-- Designing FastAPI route handlers and API endpoints
-- Implementing dependency injection for services, auth, database sessions
+FastAPI's dependency injection and async-first design enable clean, testable APIs. This skill covers essential patterns for production-ready FastAPI applications.
+
+## When to Use
+
+Use this skill when:
+- Building FastAPI applications and REST APIs
+- Implementing dependency injection for services, auth, or database sessions
 - Creating middleware for cross-cutting concerns
-- Structuring larger FastAPI applications with routers
-- Handling async database operations with FastAPI
-- Implementing background tasks and WebSockets
+- Structuring larger applications with routers
+- Handling async database operations
+- Working with background tasks
+
+## Quick Reference
+
+| Pattern | Use Case | Key Feature |
+|---------|----------|-------------|
+| Dependency Injection | Clean service wiring | `Annotated[..., Depends(...)]` |
+| Router Organization | Large app structure | `APIRouter(prefix="...")` |
+| Lifespan | Resource init/cleanup | `@asynccontextmanager` |
+| Exception Handlers | Centralized errors | `@app.exception_handler` |
+| Background Tasks | Non-blocking ops | `BackgroundTasks` |
 
 ## Core Patterns
 
@@ -26,6 +41,10 @@ Use FastAPI's dependency injection for clean, testable code.
 from typing import Annotated
 from fastapi import Depends, FastAPI
 from sqlalchemy.ext.asyncio import AsyncSession
+
+# from myapp.database import async_session, oauth2_scheme
+# from myapp.models import User
+# from myapp.services import UserService
 
 app = FastAPI()
 
@@ -83,6 +102,8 @@ Properly manage async resources like database connections.
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
+# database = Database(DATABASE_URL)
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
@@ -99,8 +120,10 @@ app = FastAPI(lifespan=lifespan)
 Centralize error handling with custom exception handlers.
 
 ```python
-from fastapi import Request
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+
+app = FastAPI()
 
 class BusinessLogicError(Exception):
     def __init__(self, message: str, status_code: int = 400):
@@ -120,7 +143,9 @@ async def business_logic_handler(request: Request, exc: BusinessLogicError):
 Use background tasks for operations that don't need to block the response.
 
 ```python
-from fastapi import BackgroundTasks
+from fastapi import FastAPI, BackgroundTasks
+
+app = FastAPI()
 
 async def send_email(email: str, message: str):
     # Async email sending
