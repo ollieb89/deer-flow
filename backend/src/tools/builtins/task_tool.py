@@ -23,7 +23,7 @@ def task_tool(
     runtime: ToolRuntime[ContextT, ThreadState],
     description: str,
     prompt: str,
-    subagent_type: Literal["general-purpose", "bash"],
+    subagent_type: Literal["general-purpose", "bash", "python-fastapi-pro"],
     tool_call_id: Annotated[str, InjectedToolCallId],
     max_turns: int | None = None,
 ) -> str:
@@ -40,6 +40,9 @@ def task_tool(
       multiple dependent steps, or would benefit from isolated context.
     - **bash**: Command execution specialist for running bash commands. Use for
       git operations, build processes, or when command output would be verbose.
+    - **python-fastapi-pro**: FastAPI and backend API development specialist. Use for
+      building FastAPI apps, async SQLAlchemy integration, API testing, and
+      implementing FastAPI patterns like dependencies and middleware.
 
     When to use this tool:
     - Complex tasks requiring multiple steps or tools
@@ -65,7 +68,7 @@ def task_tool(
     # Build config overrides
     overrides: dict = {}
 
-    skills_section = get_skills_prompt_section()
+    skills_section = get_skills_prompt_section(available_skills=set(config.skills) if config.skills else None)
     if skills_section:
         overrides["system_prompt"] = config.system_prompt + "\n\n" + skills_section
 
