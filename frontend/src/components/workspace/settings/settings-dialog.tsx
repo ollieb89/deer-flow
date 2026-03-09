@@ -7,6 +7,7 @@ import {
   PaletteIcon,
   SparklesIcon,
   WrenchIcon,
+  CpuIcon,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
@@ -20,6 +21,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { AboutSettingsPage } from "@/components/workspace/settings/about-settings-page";
 import { AppearanceSettingsPage } from "@/components/workspace/settings/appearance-settings-page";
 import { MemorySettingsPage } from "@/components/workspace/settings/memory-settings-page";
+import { ModelSettingsPage } from "@/components/workspace/settings/model-settings";
 import { NotificationSettingsPage } from "@/components/workspace/settings/notification-settings-page";
 import { SkillSettingsPage } from "@/components/workspace/settings/skill-settings-page";
 import { ToolSettingsPage } from "@/components/workspace/settings/tool-settings-page";
@@ -28,6 +30,7 @@ import { cn } from "@/lib/utils";
 
 type SettingsSection =
   | "appearance"
+  | "models"
   | "memory"
   | "tools"
   | "skills"
@@ -58,6 +61,11 @@ export function SettingsDialog(props: SettingsDialogProps) {
         id: "appearance",
         label: t.settings.sections.appearance,
         icon: PaletteIcon,
+      },
+      {
+        id: "models",
+        label: "Models",
+        icon: CpuIcon,
       },
       {
         id: "notification",
@@ -125,6 +133,7 @@ export function SettingsDialog(props: SettingsDialogProps) {
           <ScrollArea className="h-full min-h-0 rounded-lg border">
             <div className="space-y-8 p-6">
               {activeSection === "appearance" && <AppearanceSettingsPage />}
+              {activeSection === "models" && <ModelSettingsPage />}
               {activeSection === "memory" && <MemorySettingsPage />}
               {activeSection === "tools" && <ToolSettingsPage />}
               {activeSection === "skills" && (

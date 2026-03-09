@@ -1,0 +1,33 @@
+{
+  "task_id": "test-extraction",
+  "overall_passed": false,
+  "assertion_results": [
+    {
+      "assertion_type": "result_field_equals",
+      "passed": false,
+      "message": "Field 'extracted_data.heading' does not match expected value",
+      "expected": "Example Domain",
+      "actual": null
+    },
+    {
+      "assertion_type": "status_equals",
+      "passed": true,
+      "message": "Status matches expected value",
+      "expected": "success",
+      "actual": "success"
+    }
+  ],
+  "assertion_pass_count": 1,
+  "assertion_total_count": 2,
+  "score": 0.5,
+  "rubric_scores": {},
+  "metadata": {
+    "variant": "skill",
+    "execution_mode": "mock",
+    "duration_seconds": 2.1696090698242188e-05,
+    "iteration": 1,
+    "fixture_dir": "fixtures/test-extraction",
+    "executor": "mock",
+    "timestamp": "2026-03-08T18:51:22.221533Z"
+  }
+}

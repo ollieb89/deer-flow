@@ -163,6 +163,11 @@ export function useThreadStream({
           try {
             // Convert FileUIPart to File objects by fetching blob URLs
             const filePromises = message.files.map(async (fileUIPart) => {
+              // If we already have the File object, use it directly
+              if (fileUIPart.file instanceof File) {
+                return fileUIPart.file;
+              }
+
               if (fileUIPart.url && fileUIPart.filename) {
                 try {
                   // Fetch the blob URL to get the file data

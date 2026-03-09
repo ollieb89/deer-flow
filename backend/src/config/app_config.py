@@ -17,12 +17,15 @@ from src.config.summarization_config import load_summarization_config_from_dict
 from src.config.title_config import load_title_config_from_dict
 from src.config.tool_config import ToolConfig, ToolGroupConfig
 
-load_dotenv()
+# Load .env from project root
+_root_env = Path(__file__).resolve().parent.parent.parent.parent / ".env"
+load_dotenv(_root_env)
 
 
 class AppConfig(BaseModel):
     """Config for the DeerFlow application"""
 
+    environment: str = Field(default="development", description="Environment for the code execution (e.g., development, production)")
     models: list[ModelConfig] = Field(default_factory=list, description="Available models")
     sandbox: SandboxConfig = Field(description="Sandbox configuration")
     tools: list[ToolConfig] = Field(default_factory=list, description="Available tools")
@@ -65,6 +68,7 @@ class AppConfig(BaseModel):
     def from_file(cls, config_path: str | None = None) -> Self:
         """Load config from YAML file.
 
+        Supports Hydra-like `defaults` for merging multiple config files.
         See `resolve_config_path` for more details.
 
         Args:
@@ -75,7 +79,44 @@ class AppConfig(BaseModel):
         """
         resolved_path = cls.resolve_config_path(config_path)
         with open(resolved_path, encoding="utf-8") as f:
-            config_data = yaml.safe_load(f)
+            base_config_data = yaml.safe_load(f)
+
+        config_data = {}
+        
+        # Handle defaults merging
+        if "defaults" in base_config_data:
+            defaults = base_config_data.pop("defaults")
+            for item in defaults:
+                if item == "_self_":
+                    # Merge self overrides, filtering out None values to avoid overwriting defaults
+                    overrides = {k: v for k, v in base_config_data.items() if v is not None}
+                    config_data.update(overrides)
+                elif isinstance(item, str):
+                    # Load and merge external file
+                    external_path = resolved_path.parent / item
+                    if not external_path.exists():
+                        external_path = Path(item)
+                    
+                    if external_path.exists():
+                        with open(external_path, encoding="utf-8") as f:
+                            external_data = yaml.safe_load(f)
+                        if external_data:
+                            if isinstance(external_data, dict):
+                                config_data.update(external_data)
+                            elif isinstance(external_data, list):
+                                # Use filename stem as key (e.g. models.yaml -> models)
+                                key = external_path.stem
+                                config_data[key] = external_data
+                    else:
+                        # Optional: warn or ignore if external file not found?
+                        pass
+        else:
+            config_data = base_config_data
+
+        # Ensure models is at least an empty list if it's null in YAML
+        if config_data.get("models") is None:
+            config_data["models"] = []
+
         config_data = cls.resolve_env_variables(config_data)
 
         # Load title config if present

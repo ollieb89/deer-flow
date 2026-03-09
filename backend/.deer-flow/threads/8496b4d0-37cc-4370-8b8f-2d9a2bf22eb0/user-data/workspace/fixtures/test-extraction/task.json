@@ -1,0 +1,10 @@
+{
+  "id": "test-extraction",
+  "prompt": "Visit https://example.com and extract the main heading (h1) text.",
+  "start_url": null,
+  "requires_browser": true,
+  "environment": {
+    "env_vars": {}
+  },
+  "metadata": {}
+}

@@ -1,0 +1,16 @@
+{
+  "assertions": [
+    {
+      "type": "result_field_equals",
+      "field": "extracted_data.heading",
+      "expected": "Example Domain",
+      "weight": 1.0
+    },
+    {
+      "type": "status_equals",
+      "expected": "success",
+      "weight": 0.5
+    }
+  ],
+  "rubric": {}
+}

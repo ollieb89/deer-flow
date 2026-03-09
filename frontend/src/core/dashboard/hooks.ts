@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 
-import { useAgents } from "@/core/agents/hooks";
 import { useMemory } from "@/core/memory/hooks";
 import { useModels } from "@/core/models/hooks";
 import { useSkills } from "@/core/skills/hooks";

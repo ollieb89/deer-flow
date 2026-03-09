@@ -1,0 +1,261 @@
+{
+  "$schema": "https://clawbo.ai/skill-eval-schema/v1",
+  "skill_id": "agent-browser",
+  "description": "Test suite for agent-browser automation skill",
+  "test_cases": [
+    {
+      "id": "simple-01",
+      "difficulty": "simple",
+      "prompt": "Open https://example.com and take a screenshot of the page.",
+      "expected_behavior": "Browser opens the specified URL and saves a screenshot file.",
+      "assertions": [
+        "screenshot file exists in workspace",
+        "command 'agent-browser open https://example.com' executed",
+        "command 'agent-browser screenshot' executed"
+      ],
+      "tags": ["navigation", "media"]
+    },
+    {
+      "id": "simple-02",
+      "difficulty": "simple",
+      "prompt": "On https://example.com, click the 'More information' link.",
+      "expected_behavior": "Browser clicks the link identified by its text content.",
+      "assertions": [
+        "navigation occurred (URL changed or page updated)",
+        "command 'agent-browser click' executed with correct ref",
+        "element was found via snapshot"
+      ],
+      "tags": ["interaction"]
+    },
+    {
+      "id": "simple-03",
+      "difficulty": "simple",
+      "prompt": "Fill the search box with 'browser automation' and submit the form.",
+      "expected_behavior": "Input field is populated and form is submitted (via Enter or submit button).",
+      "assertions": [
+        "element 'search box' located",
+        "fill command used with expected text",
+        "submit action performed (Enter or click)"
+      ],
+      "tags": ["forms"]
+    },
+    {
+      "id": "simple-04",
+      "difficulty": "simple",
+      "prompt": "Extract the main heading (h1) text from https://example.com.",
+      "expected_behavior": "Returns the h1 text content.",
+      "assertions": [
+        "get text command executed on h1 element",
+        "output is non-empty string",
+        "element was located"
+      ],
+      "tags": ["extraction"]
+    },
+    {
+      "id": "simple-05",
+      "difficulty": "simple",
+      "prompt": "Wait until the 'Examples' section is visible on the page.",
+      "expected_behavior": "Browser waits until the specified element appears, then continues.",
+      "assertions": [
+        "wait command used with appropriate selector or text condition",
+        "wait completes successfully within timeout"
+      ],
+      "tags": ["waiting"]
+    },
+    {
+      "id": "moderate-01",
+      "difficulty": "moderate",
+      "prompt": "Log into https://example.com/login with username 'user@example.com' and password 'Pass123!'. Verify login by checking for 'Dashboard' or user avatar.",
+      "expected_behavior": "Form is filled and submitted; after navigation, presence of dashboard indicators is confirmed.",
+      "assertions": [
+        "login form inputs located and filled",
+        "submit button clicked",
+        "wait for navigation/load",
+        "check for post-login elements (Dashboard, avatar, logout button)",
+        "report success/failure"
+      ],
+      "tags": ["authentication", "verification"]
+    },
+    {
+      "id": "moderate-02",
+      "difficulty": "moderate",
+      "prompt": "Search for 'laptop' on https://shop.com, sort by price low to high, and extract the names and prices of the first 5 results.",
+      "expected_behavior": "Search executed, sort applied, data extracted into structured format (list of objects).",
+      "assertions": [
+        "search input filled and submitted",
+        "sort dropdown changed successfully",
+        "extracted at least 5 product items",
+        "data includes both name and price for each",
+        "prices appear in ascending order"
+      ],
+      "tags": ["extraction", "forms"]
+    },
+    {
+      "id": "moderate-03",
+      "difficulty": "moderate",
+      "prompt": "Go through all pages of the product catalog (pagination) and collect every product name.",
+      "expected_behavior": "Iterates through pagination links until the last page and aggregates product names.",
+      "assertions": [
+        "on each page, product names extracted",
+        "next button clicked repeatedly until disabled or absent",
+        "no duplicate product names in final list",
+        "total count of products matches expected"
+      ],
+      "tags": ["pagination", "extraction"]
+    },
+    {
+      "id": "moderate-04",
+      "difficulty": "moderate",
+      "prompt": "Upload the file '/tmp/resume.pdf' to the application form and submit.",
+      "expected_behavior": "File input is targeted and file uploaded; form submitted; confirmation received.",
+      "assertions": [
+        "file input element located",
+        "upload command executed with provided file path",
+        "form submitted",
+        "success message or next step appears"
+      ],
+      "tags": ["upload", "forms"]
+    },
+    {
+      "id": "moderate-05",
+      "difficulty": "moderate",
+      "prompt": "Fill out the contact form (name, email, subject, message), submit, and return the confirmation text.",
+      "expected_behavior": "All fields filled, form submitted, confirmation message captured and returned.",
+      "assertions": [
+        "each required field located and filled with appropriate data",
+        "submit performed",
+        "confirmation message extracted after submission"
+      ],
+      "tags": ["forms", "extraction"]
+    },
+    {
+      "id": "moderate-06",
+      "difficulty": "moderate",
+      "prompt": "Log in once and save the browser state to 'session.auth'. Then in a separate run, load the state and go directly to the protected dashboard without logging in again.",
+      "expected_behavior": "First run saves state; second run loads state and accesses dashboard directly.",
+      "assertions": [
+        "state save command executed after login",
+        "state load command executed before navigation to dashboard",
+        "dashboard accessible without re-login"
+      ],
+      "tags": ["authentication", "state"]
+    },
+    {
+      "id": "moderate-07",
+      "difficulty": "moderate",
+      "prompt": "Record a video of the entire login process from start to completion as 'login.webm'.",
+      "expected_behavior": "Recording starts, login actions performed, recording stopped and saved.",
+      "assertions": [
+        "record start command executed before actions",
+        "record stop command executed after login",
+        "output video file exists and non-zero size"
+      ],
+      "tags": ["recording", "media"]
+    },
+    {
+      "id": "complex-01",
+      "difficulty": "complex",
+      "prompt": "On an infinite scroll news feed, scroll down repeatedly until no new articles appear, then extract all article headlines.",
+      "expected_behavior": "Scrolls until content stabilizes, then collects all headlines without duplicates.",
+      "assertions": [
+        "scroll down executed in loop",
+        "waits after each scroll to allow loading",
+        "loop termination condition implemented (no new content)",
+        "all headlines extracted, unique"
+      ],
+      "tags": ["scrolling", "dynamic-content", "extraction"]
+    },
+    {
+      "id": "complex-02",
+      "difficulty": "complex",
+      "prompt": "Fill a multi-field form that includes text inputs, a dropdown, checkboxes, radio buttons, and a textarea. Submit and verify all fields were accepted.",
+      "expected_behavior": "All field types handled correctly; submission successful; server accepts data.",
+      "assertions": [
+        "text inputs filled",
+        "select option chosen",
+        "checkboxes checked/unchecked as specified",
+        "radio option selected",
+        "textarea filled",
+        "submission successful"
+      ],
+      "tags": ["forms", "multi-field"]
+    },
+    {
+      "id": "complex-03",
+      "difficulty": "complex",
+      "prompt": "Simulate an e-commerce checkout: add item to cart, go to cart, proceed to shipping, fill address, select shipping method, proceed to payment (do not pay), capture the order summary.",
+      "expected_behavior": "Completes steps up to payment page and extracts order summary details (items, subtotal, shipping).",
+      "assertions": [
+        "add to cart button clicked",
+        "cart page reached",
+        "checkout steps navigated",
+        "address form filled",
+        "shipping method selected",
+        "order summary elements extracted"
+      ],
+      "tags": ["multi-step", "checkout"]
+    },
+    {
+      "id": "complex-04",
+      "difficulty": "complex",
+      "prompt": "Extract only the products that are 'In Stock' from a product grid that includes stock status badges. Include product name, price, and stock status in the output.",
+      "expected_behavior": "Parses each product card, filters by stock badge, returns structured data for in-stock items only.",
+      "assertions": [
+        "snapshot or get used to collect all product elements",
+        "each product's stock status identified",
+        "filter applied correctly",
+        "output contains name, price, and stock status for each in-stock product"
+      ],
+      "tags": ["extraction", "conditional"]
+    },
+    {
+      "id": "advanced-01",
+      "difficulty": "advanced",
+      "prompt": "Mock the API endpoint '/api/product/123' to return a fixed JSON with price 999.99, then navigate to the product page and verify that the displayed price is the mocked value.",
+      "expected_behavior": "Network route is set to mock; product page loads; price element shows 999.99.",
+      "assertions": [
+        "network route command executed with correct URL and mock JSON",
+        "product page opened",
+        "price element extracted and equals 999.99",
+        "route cleanup or teardown (optional)"
+      ],
+      "tags": ["network", "mocking", "verification"]
+    },
+    {
+      "id": "advanced-02",
+      "difficulty": "advanced",
+      "prompt": "Start two separate sessions: 'admin' logs into admin.example.com, 'user' logs into user.example.com. Then in the admin session, verify that the admin panel shows an elevated privileges badge.",
+      "expected_behavior": "Two isolated sessions run concurrently; admin session displays admin-only content.",
+      "assertions": [
+        "two sessions started with --session flag",
+        "different credentials used per session",
+        "each session navigated to respective domain",
+        "admin session contains expected admin element"
+      ],
+      "tags": ["sessions", "isolation"]
+    },
+    {
+      "id": "error-01",
+      "difficulty": "error",
+      "prompt": "Try to click a button that may not appear immediately (max 10s wait). If it appears, click it; if not, report that the button was not found.",
+      "expected_behavior": "Waits up to 10 seconds for element; clicks if found; reports timeout otherwise.",
+      "assertions": [
+        "snapshot or is visible used in a retry loop",
+        "timeout respected",
+        "clear success/failure output"
+      ],
+      "tags": ["waiting", "retry"]
+    },
+    {
+      "id": "error-02",
+      "difficulty": "error",
+      "prompt": "A page is loading slowly. Use a custom wait condition to proceed only when a specific text 'Ready' appears, with a 30-second timeout.",
+      "expected_behavior": "Waits for text condition; aborts after timeout; reports status.",
+      "assertions": [
+        "wait --text 'Ready' used with timeout 30000",
+        "appropriate handling of timeout case"
+      ],
+      "tags": ["waiting", "timeout"]
+    }
+  ]
+}

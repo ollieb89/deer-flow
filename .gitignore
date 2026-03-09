@@ -33,7 +33,6 @@ extensions_config.json
 # Coverage report
 coverage.xml
 coverage/
-.deer-flow/
 .claude/
 skills/custom/*
 logs/

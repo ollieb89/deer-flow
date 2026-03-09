@@ -1,0 +1,10 @@
+{
+  "id": "test-navigation",
+  "prompt": "Navigate to https://example.com and verify the page loads successfully.",
+  "start_url": null,
+  "requires_browser": true,
+  "environment": {
+    "env_vars": {}
+  },
+  "metadata": {}
+}

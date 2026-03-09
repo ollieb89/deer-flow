@@ -1,0 +1,7 @@
+{
+  "assertions": [
+    "screenshot file exists in workspace",
+    "command 'agent-browser open https://example.com' executed",
+    "command 'agent-browser screenshot' executed"
+  ]
+}

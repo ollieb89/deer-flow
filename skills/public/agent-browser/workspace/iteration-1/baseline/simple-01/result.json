@@ -1,0 +1,7 @@
+{
+  "success": false,
+  "commands": [],
+  "output": "",
+  "error": "name 'fixtures' is not defined",
+  "duration": 9.870529174804688e-05
+}

@@ -10,9 +10,7 @@ export function useThreadChat() {
   const pathname = usePathname();
 
   const searchParams = useSearchParams();
-  const [threadId, setThreadId] = useState(() => {
-    return threadIdFromPath === "new" ? uuid() : threadIdFromPath;
-  });
+  const [threadId, setThreadId] = useState(threadIdFromPath);
 
   const [isNewThread, setIsNewThread] = useState(
     () => threadIdFromPath === "new",

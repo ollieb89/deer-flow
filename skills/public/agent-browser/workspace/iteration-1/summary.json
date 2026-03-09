@@ -1,0 +1,21 @@
+{
+  "iteration": 1,
+  "timestamp": "2026-03-08T19:38:22.935326",
+  "total_tests": 2,
+  "skill": {
+    "executor_passed": 2,
+    "executor_failed": 0,
+    "grader_passed": 0,
+    "grader_failed": 2,
+    "assertion_count": 6,
+    "assertion_passed": 1
+  },
+  "baseline": {
+    "executor_passed": 1,
+    "executor_failed": 1,
+    "grader_passed": 0,
+    "grader_failed": 2,
+    "assertion_count": 6,
+    "assertion_passed": 1
+  }
+}

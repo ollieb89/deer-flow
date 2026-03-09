@@ -1,0 +1,15 @@
+{
+  "assertions": [
+    {
+      "type": "invoked_skill_equals",
+      "expected": true,
+      "weight": 1.0
+    },
+    {
+      "type": "status_equals",
+      "expected": "success",
+      "weight": 0.5
+    }
+  ],
+  "rubric": {}
+}

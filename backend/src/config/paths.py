@@ -72,6 +72,10 @@ class Paths:
         """Directory for a specific agent: `{base_dir}/agents/{name}/`."""
         return self.agents_dir / name.lower()
 
+    def agent_skills_dir(self, name: str) -> Path:
+        """Directory for an agent's specific skills: `{base_dir}/agents/{name}/skills/`."""
+        return self.agent_dir(name) / "skills"
+
     def agent_memory_file(self, name: str) -> Path:
         """Per-agent memory file: `{base_dir}/agents/{name}/memory.json`."""
         return self.agent_dir(name) / "memory.json"

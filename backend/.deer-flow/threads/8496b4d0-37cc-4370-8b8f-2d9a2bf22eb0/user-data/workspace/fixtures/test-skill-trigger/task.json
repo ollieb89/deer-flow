@@ -1,0 +1,15 @@
+{
+  "id": "test-skill-trigger",
+  "prompt": "Perform a login operation on a mock authentication page.",
+  "start_url": null,
+  "requires_browser": true,
+  "environment": {
+    "env_vars": {}
+  },
+  "metadata": {
+    "phase1": {
+      "expected_trigger": true,
+      "description": "This task should trigger the browser skill (login flow)"
+    }
+  }
+}

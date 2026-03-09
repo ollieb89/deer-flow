@@ -1,0 +1,14 @@
+{
+  "success": true,
+  "duration": 0.00010061264038085938,
+  "commands": [
+    "click 'Submit'"
+  ],
+  "output": "Clicked submit button",
+  "error": "",
+  "metadata": {
+    "files_created": [],
+    "extracted_count": 0,
+    "extractions": []
+  }
+}

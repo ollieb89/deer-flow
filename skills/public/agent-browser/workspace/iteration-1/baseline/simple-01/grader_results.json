@@ -1,0 +1,23 @@
+{
+  "passed": false,
+  "assertion_count": 3,
+  "passed_count": 0,
+  "summary": "Evaluation Summary: 0/3 assertions passed\nOverall: FAIL\nFailed assertions:\n  - screenshot file exists in workspace: Required files not found: ['screenshot.png']\n  - command 'agent-browser open https://example.com' executed: Expected command not found: agent-browser open https://example.com\n  - command 'agent-browser screenshot' executed: Expected command not found: agent-browser screenshot",
+  "assertions": [
+    {
+      "assertion": "screenshot file exists in workspace",
+      "passed": false,
+      "details": "Required files not found: ['screenshot.png']"
+    },
+    {
+      "assertion": "command 'agent-browser open https://example.com' executed",
+      "passed": false,
+      "details": "Expected command not found: agent-browser open https://example.com"
+    },
+    {
+      "assertion": "command 'agent-browser screenshot' executed",
+      "passed": false,
+      "details": "Expected command not found: agent-browser screenshot"
+    }
+  ]
+}

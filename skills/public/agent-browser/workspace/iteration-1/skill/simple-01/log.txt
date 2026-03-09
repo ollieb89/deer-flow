@@ -1,0 +1,24 @@
+Test ID: simple-01
+Difficulty: simple
+Mode: skill
+Start: 2026-03-08T19:38:22.926896
+Executor Success: True
+Grader Passed: False
+Assertions: 0/3
+Duration: 0.01s
+Executor Error: 
+
+--- Commands ---
+check: agent-browser available
+Simulated real execution would happen here
+
+--- Output ---
+Real executor stub - needs AI reasoning integration
+
+--- Grader Summary ---
+Evaluation Summary: 0/3 assertions passed
+Overall: FAIL
+Failed assertions:
+  - screenshot file exists in workspace: Required files not found: ['screenshot.png']
+  - command 'agent-browser open https://example.com' executed: Expected command not found: agent-browser open https://example.com
+  - command 'agent-browser screenshot' executed: Expected command not found: agent-browser screenshot

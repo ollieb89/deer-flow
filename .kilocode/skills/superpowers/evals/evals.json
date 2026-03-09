@@ -1,0 +1,19 @@
+{
+  "skill_name": "superpowers",
+  "evals": [
+    {
+      "id": 0,
+      "name": "new-cli-tool",
+      "prompt": "I want to build a simple CLI tool in Python that counts the number of words in a given text file. The tool should take the file path as an argument and print the word count.",
+      "expected_output": "The agent should start with brainstorming, then create an implementation plan with TDD steps, and finally execute the first batch of tasks (e.g., creating the project structure and the first test).",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "refactor-logic",
+      "prompt": "I have a file `utils.py` that contains a `calculate_fibonacci` function using a simple recursive approach. I want to refactor it to use dynamic programming for better performance. Please help me with this refactor following the Superpowers methodology.",
+      "expected_output": "The agent should brainstorm the refactor, propose the DP approach, write a plan that includes performance tests, and then execute the refactor.",
+      "files": []
+    }
+  ]
+}

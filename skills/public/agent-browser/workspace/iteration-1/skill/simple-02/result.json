@@ -1,0 +1,11 @@
+{
+  "success": true,
+  "duration": 0.003448009490966797,
+  "commands": [
+    "check: agent-browser available",
+    "Simulated real execution would happen here"
+  ],
+  "output": "Real executor stub - needs AI reasoning integration",
+  "error": "",
+  "metadata": {}
+}

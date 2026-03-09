@@ -1,0 +1,33 @@
+{
+  "task_id": "test-navigation",
+  "overall_passed": false,
+  "assertion_results": [
+    {
+      "assertion_type": "final_url_equals",
+      "passed": false,
+      "message": "Final URL does not match expected value",
+      "expected": "https://example.com/",
+      "actual": null
+    },
+    {
+      "assertion_type": "status_equals",
+      "passed": true,
+      "message": "Status matches expected value",
+      "expected": "success",
+      "actual": "success"
+    }
+  ],
+  "assertion_pass_count": 1,
+  "assertion_total_count": 2,
+  "score": 0.5,
+  "rubric_scores": {},
+  "metadata": {
+    "variant": "baseline",
+    "execution_mode": "mock",
+    "duration_seconds": 1.3828277587890625e-05,
+    "iteration": 1,
+    "fixture_dir": "fixtures/test-navigation",
+    "executor": "mock",
+    "timestamp": "2026-03-08T18:51:36.885746Z"
+  }
+}

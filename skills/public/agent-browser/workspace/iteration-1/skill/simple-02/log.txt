@@ -1,0 +1,23 @@
+Test ID: simple-02
+Difficulty: simple
+Mode: skill
+Start: 2026-03-08T19:38:22.933441
+Executor Success: True
+Grader Passed: False
+Assertions: 1/3
+Duration: 0.00s
+Executor Error: 
+
+--- Commands ---
+check: agent-browser available
+Simulated real execution would happen here
+
+--- Output ---
+Real executor stub - needs AI reasoning integration
+
+--- Grader Summary ---
+Evaluation Summary: 1/3 assertions passed
+Overall: FAIL
+Failed assertions:
+  - command 'agent-browser click' executed with correct ref: Expected command not found: agent-browser click
+  - element located: No element location evidence

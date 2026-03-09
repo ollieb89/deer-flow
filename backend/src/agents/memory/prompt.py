@@ -4,7 +4,7 @@ import re
 from typing import Any
 
 try:
-    import tiktoken
+    import tiktoken  # type: ignore[missing-module-attribute]
 
     TIKTOKEN_AVAILABLE = True
 except ImportError:
@@ -166,6 +166,39 @@ def _count_tokens(text: str, encoding_name: str = "cl100k_base") -> int:
         return len(text) // 4
 
 
+def _truncate_tokens(text: str, max_tokens: int, encoding_name: str = "cl100k_base") -> str:
+    """Truncate text to a maximum number of tokens.
+
+    Args:
+        text: The text to truncate.
+        max_tokens: The maximum number of tokens allowed.
+        encoding_name: The encoding to use.
+
+    Returns:
+        Truncated text with ellipsis if truncated.
+    """
+    if not TIKTOKEN_AVAILABLE:
+        # Fallback to character-based truncation
+        # Use 3 chars per token as a safe estimate for truncation
+        target_chars = max_tokens * 3
+        if len(text) <= target_chars:
+            return text
+        return text[:target_chars] + "\n..."  # type: ignore[misc]
+
+    try:
+        encoding = tiktoken.get_encoding(encoding_name)
+        tokens = encoding.encode(text)
+        if len(tokens) <= max_tokens:
+            return text
+        return encoding.decode(tokens[:max_tokens]) + "\n..."
+    except Exception:
+        # Fallback on error
+        target_chars = max_tokens * 3
+        if len(text) <= target_chars:
+            return text
+        return text[:target_chars] + "\n..."  # type: ignore[misc]
+
+
 def format_memory_for_injection(memory_data: dict[str, Any], max_tokens: int = 2000) -> str:
     """Format memory data for injection into system prompt.
 
@@ -222,16 +255,8 @@ def format_memory_for_injection(memory_data: dict[str, Any], max_tokens: int = 2
 
     result = "\n\n".join(sections)
 
-    # Use accurate token counting with tiktoken
-    token_count = _count_tokens(result)
-    if token_count > max_tokens:
-        # Truncate to fit within token limit
-        # Estimate characters to remove based on token ratio
-        char_per_token = len(result) / token_count
-        target_chars = int(max_tokens * char_per_token * 0.95)  # 95% to leave margin
-        result = result[:target_chars] + "\n..."
-
-    return result
+    # Use accurate token-based truncation
+    return _truncate_tokens(result, max_tokens)
 
 
 def format_conversation_for_update(messages: list[Any]) -> str:
@@ -261,9 +286,9 @@ def format_conversation_for_update(messages: list[Any]) -> str:
             if not content:
                 continue
 
-        # Truncate very long messages
-        if len(str(content)) > 1000:
-            content = str(content)[:1000] + "..."
+        # Truncate very long messages (approx 1000-1500 tokens)
+        if len(str(content)) > 4000:
+            content = str(content)[:4000] + "..."  # type: ignore[misc]
 
         if role == "human":
             lines.append(f"User: {content}")

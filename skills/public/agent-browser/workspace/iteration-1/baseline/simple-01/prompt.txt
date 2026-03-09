@@ -1,0 +1,1 @@
+Open https://example.com and take a screenshot of the page.

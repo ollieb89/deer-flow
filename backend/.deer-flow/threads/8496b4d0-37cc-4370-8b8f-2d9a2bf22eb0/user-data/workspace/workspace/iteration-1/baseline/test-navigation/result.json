@@ -1,0 +1,37 @@
+{
+  "task_id": "test-navigation",
+  "status": "success",
+  "execution_mode": "mock",
+  "invoked_skill": true,
+  "final_url": null,
+  "extracted_data": {},
+  "actions": [
+    {
+      "type": "navigate",
+      "url": "http://localhost:8000/",
+      "success": true,
+      "timestamp": "2026-03-08T18:51:36Z"
+    },
+    {
+      "type": "extract",
+      "selector": "body",
+      "value": "Sample content",
+      "success": true,
+      "timestamp": "2026-03-08T18:51:36Z"
+    }
+  ],
+  "logs": [
+    "Mock execution for task test-navigation"
+  ],
+  "stdout": "Mock executor: processed test-navigation",
+  "stderr": "",
+  "error": null,
+  "duration_seconds": 1.3828277587890625e-05,
+  "metadata": {
+    "mock_mode": true,
+    "expected_invoked": true,
+    "variant": "baseline",
+    "iteration": 1,
+    "fixture_dir": "fixtures/test-navigation"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "task_id": "test-skill-trigger",
+  "overall_passed": true,
+  "assertion_results": [
+    {
+      "assertion_type": "invoked_skill_equals",
+      "passed": true,
+      "message": "Invoked skill matches expected value",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "assertion_type": "status_equals",
+      "passed": true,
+      "message": "Status matches expected value",
+      "expected": "success",
+      "actual": "success"
+    },
+    {
+      "assertion_type": "invoked_skill_equals",
+      "passed": true,
+      "message": "Invoked skill matches expected value",
+      "expected": true,
+      "actual": true
+    }
+  ],
+  "assertion_pass_count": 3,
+  "assertion_total_count": 3,
+  "score": 1.0,
+  "rubric_scores": {},
+  "metadata": {
+    "variant": "skill",
+    "execution_mode": "mock",
+    "duration_seconds": 1.0251998901367188e-05,
+    "iteration": 1,
+    "fixture_dir": "fixtures/test-skill-trigger",
+    "executor": "mock",
+    "timestamp": "2026-03-08T18:51:22.222883Z"
+  }
+}

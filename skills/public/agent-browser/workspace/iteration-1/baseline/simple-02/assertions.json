@@ -1,0 +1,7 @@
+{
+  "assertions": [
+    "navigation occurred (URL changed or page updated)",
+    "command 'agent-browser click' executed with correct ref",
+    "element was found via snapshot"
+  ]
+}

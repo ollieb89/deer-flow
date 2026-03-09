@@ -99,6 +99,15 @@ LLM-powered persistent context retention across conversations:
 - **System prompt injection**: Top facts + context injected into agent prompts
 - **Storage**: JSON file with mtime-based cache invalidation
 
+### Kilocode Model Discovery
+Low-latency, searchable model registry powered by the Kilocode API:
+- **Unified Schema**: Standardizes 340+ models from 60+ providers (OpenAI, Anthropic, DeepSeek, etc.).
+- **Smart Filtering**: Native support for filtering by capabilities: `Vision`, `Thinking`, and `Tool Calling`.
+- **Optimized Persistence**: SQLAlchemy-backed with database indexes on capabilities and status for high-performance searching.
+- **Batch Synchronization**: Specialized CLI for atomic batch upserts, eliminating N+1 query bottlenecks.
+- **Advanced Search**: Case-insensitive ILIKE search across model names and IDs.
+- **Stats Engine**: Aggregated system-wide statistics for provider distribution and capability coverage.
+
 ### Tool Ecosystem
 
 | Category | Tools |
@@ -115,13 +124,15 @@ FastAPI application providing REST endpoints for frontend integration:
 
 | Route | Purpose |
 |-------|---------|
-| `GET /api/models` | List available LLM models |
-| `GET/PUT /api/mcp/config` | Manage MCP server configurations |
+| `GET /api/kilocode/models` | List models with search, filter, and pagination |
+| `GET /api/kilocode/stats` | Get system-wide model & provider statistics |
+| `GET /api/kilocode/providers` | List all available model providers |
+| `POST /api/kilocode/sync` | Trigger an on-demand model synchronization |
+| `GET /api/mcp/config` | Manage MCP server configurations |
 | `GET/PUT /api/skills` | List and manage skills |
 | `POST /api/skills/install` | Install skill from `.skill` archive |
 | `GET /api/memory` | Retrieve memory data |
 | `POST /api/memory/reload` | Force memory reload |
-| `GET /api/memory/config` | Memory configuration |
 | `GET /api/memory/status` | Combined config + data |
 | `POST /api/threads/{id}/uploads` | Upload files (auto-converts PDF/PPT/Excel/Word to Markdown) |
 | `GET /api/threads/{id}/uploads/list` | List uploaded files |
@@ -192,6 +203,20 @@ make gateway
 ```
 
 Direct access: LangGraph at http://localhost:2024, Gateway at http://localhost:8001
+
+### Model Synchronization
+
+To keep your local model database in sync with latest upstream releases:
+
+```bash
+cd backend
+
+# Preview sync (Dry Run)
+uv run python -m src.kilocode.model_fetcher --dry-run
+
+# Perform actual sync
+uv run python -m src.kilocode.model_fetcher
+```
 
 ---
 

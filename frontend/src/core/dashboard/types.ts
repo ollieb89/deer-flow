@@ -1,4 +1,4 @@
-import type { Todo } from "@/core/todos";
+// Note: Todo type is imported in utils.ts where it's used
 
 /**
  * Dashboard statistics overview

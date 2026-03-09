@@ -13,23 +13,25 @@ def generate_video(
 ) -> str:
     with open(prompt_file, "r") as f:
         prompt = f.read()
-    referenceImages = []
-    i = 0
-    json = {
-        "instances": [{"prompt": prompt}],
-    }
-    for reference_image in reference_images:
-        i += 1
-        with open(reference_image, "rb") as f:
-            image_b64 = base64.b64encode(f.read()).decode("utf-8")
-        referenceImages.append(
-            {
+    # Build request payload
+    instance = {"prompt": prompt}
+    if reference_images:
+        ref_images_data = []
+        for img_path in reference_images:
+            with open(img_path, "rb") as f:
+                image_b64 = base64.b64encode(f.read()).decode("utf-8")
+            ref_images_data.append({
                 "image": {"mimeType": "image/jpeg", "bytesBase64Encoded": image_b64},
                 "referenceType": "asset",
-            }
-        )
-    if i > 0:
-        json["instances"][0]["referenceImages"] = referenceImages
+            })
+        instance["referenceImages"] = ref_images_data # type: ignore (handled by explicit dict structure)
+
+    payload = {
+        "instances": [instance],
+        "parameters": {
+             "aspectRatio": aspect_ratio,
+        }
+    }
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         return "GEMINI_API_KEY is not set"
@@ -39,10 +41,13 @@ def generate_video(
             "x-goog-api-key": api_key,
             "Content-Type": "application/json",
         },
-        json=json,
+        json=payload,
     )
-    json = response.json()
-    operation_name = json["name"]
+    res_json = response.json()
+    if "error" in res_json:
+        return f"Error from API: {res_json['error'].get('message', 'Unknown error')}"
+        
+    operation_name = res_json["name"]
     while True:
         response = requests.get(
             f"https://generativelanguage.googleapis.com/v1beta/{operation_name}",
@@ -50,9 +55,12 @@ def generate_video(
                 "x-goog-api-key": api_key,
             },
         )
-        json = response.json()
-        if json.get("done", False):
-            sample = json["response"]["generateVideoResponse"]["generatedSamples"][0]
+        op_json = response.json()
+        if op_json.get("done", False):
+            if "error" in op_json:
+                return f"Operation failed: {op_json['error'].get('message', 'Unknown error')}"
+                
+            sample = op_json["response"]["generateVideoResponse"]["generatedSamples"][0]
             url = sample["video"]["uri"]
             download(url, output_file)
             break

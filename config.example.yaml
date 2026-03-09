@@ -103,6 +103,221 @@ models:
   #       thinking:
   #         type: enabled
 
+  # Example: OpenRouter Integration
+  # OpenRouter provides a unified API for 100+ models
+  # See: https://openrouter.ai
+  # - name: stepfun/step-3.5-flash:free
+  #   display_name: Step 3.5 Flash (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: stepfun/step-3.5-flash:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: true
+  #   supports_vision: false
+  #   extra_body:
+  #     include_reasoning: true
+  #
+  # - name: nvidia/nemotron-3-nano-30b-a3b:free
+  #   display_name: NVIDIA: Nemotron 3 Nano 30B A3B (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: nvidia/nemotron-3-nano-30b-a3b:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: false
+  #
+  # - name: arcee-ai/trinity-mini:free
+  #   display_name: Arcee AI: Trinity Mini (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: arcee-ai/trinity-mini:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: true
+  #   supports_vision: false
+  #
+  # - name: nvidia/nemotron-nano-9b-v2:free
+  #   display_name: NVIDIA: Nemotron Nano 9B V2 (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: nvidia/nemotron-nano-9b-v2:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: false
+  #
+  # - name: nvidia/nemotron-nano-12b-v2-vl:free
+  #   display_name: NVIDIA: Nemotron Nano 12B 2 VL (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: nvidia/nemotron-nano-12b-v2-vl:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: true
+  #   supports_vision: true
+  #
+  # - name: openai/gpt-oss-120b:free
+  #   display_name: OpenAI: GPT-OSS 120B (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: openai/gpt-oss-120b:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: false
+  #
+  # - name: meta-llama/llama-3.3-70b-instruct:free
+  #   display_name: Llama 3.3 70B Instruct (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: meta-llama/llama-3.3-70b-instruct:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: false
+  #
+  # - name: qwen/qwen3-coder-480b-a35b:free
+  #   display_name: Qwen3 Coder 480B A35B (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: qwen/qwen3-coder-480b-a35b:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: false
+  #
+  # - name: openai/gpt-oss-20b:free
+  #   display_name: OpenAI: GPT-OSS 20B (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: openai/gpt-oss-20b:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: false
+  #
+  # - name: qwen/qwen3-next-80b-a3b-instruct:free
+  #   display_name: Qwen3 Next 80B A3B Instruct (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: qwen/qwen3-next-80b-a3b-instruct:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: false
+  #
+  # - name: google/gemma-3-27b-it:free
+  #   display_name: Google: Gemma 3 27B (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: google/gemma-3-27b-it:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: true
+  #   supports_vision: true
+  #
+  # - name: mistralai/mistral-small-3.1-24b-instruct:free
+  #   display_name: Mistral Small 3.1 24B (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: mistralai/mistral-small-3.1-24b-instruct:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: true
+  #   supports_vision: false
+  #
+  # - name: qwen/qwen-turbo:free
+  #   display_name: Qwen Turbo (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: qwen/qwen-turbo:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: false
+  #
+  # - name: google/gemma-3-12b-it:free
+  #   display_name: Google: Gemma 3 12B (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: google/gemma-3-12b-it:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: true
+  #   supports_vision: true
+  #
+  # - name: google/gemma-3-4b-it:free
+  #   display_name: Google: Gemma 3 4B (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: google/gemma-3-4b-it:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: true
+  #   supports_vision: true
+  #
+  # - name: qwen/qwen-plus:free
+  #   display_name: Qwen Plus (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: qwen/qwen-plus:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: false
+  #
+  # - name: deepseek/deepseek-r1:free
+  #   display_name: DeepSeek R1 (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: deepseek/deepseek-r1:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: true
+  #   supports_vision: false
+  #   extra_body:
+  #     include_reasoning: true
+  #
+  # - name: qwen/qwen-2-vl-7b-instruct:free
+  #   display_name: Qwen 2 VL 7B Instruct (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: qwen/qwen-2-vl-7b-instruct:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: true
+  #
+  # - name: mistralai/pixtral-12b:free
+  #   display_name: Pixtral 12B (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: mistralai/pixtral-12b:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: true
+  #
+  # - name: meta-llama/llama-3.1-405b-instruct:free
+  #   display_name: Llama 3.1 405B Instruct (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: meta-llama/llama-3.1-405b-instruct:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: false
+  #
+  # - name: microsoft/phi-4:free
+  #   display_name: Phi-4 (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: microsoft/phi-4:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: true
+  #   supports_vision: false
+  #
+  # - name: liquid/lfm-2.5-1.2b-thinking:free
+  #   display_name: LFM 2.5 1.2B Thinking (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: liquid/lfm-2.5-1.2b-thinking:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: true
+  #   supports_vision: false
+  #
+  # - name: mistralai/mistral-7b-instruct:free
+  #   display_name: Mistral 7B Instruct (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: mistralai/mistral-7b-instruct:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: false
+  #
+  # - name: google/gemma-2-9b-it:free
+  #   display_name: Gemma 2 9B (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: google/gemma-2-9b-it:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: false
+  #
+  # - name: meta-llama/llama-3.1-8b-instruct:free
+  #   display_name: Llama 3.1 8B Instruct (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: meta-llama/llama-3.1-8b-instruct:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: false
+  #   supports_vision: false
+  #
+  # - name: z-ai/glm-4.5-air:free
+  #   display_name: GLM-4.5-Air (Free)
+  #   use: src.models.openrouter:ChatOpenRouter
+  #   model: z-ai/glm-4.5-air:free
+  #   api_key: $OPENROUTER_API_KEY
+  #   supports_thinking: true
+  #   supports_vision: false
+
 # ============================================================================
 # Tool Groups Configuration
 # ============================================================================

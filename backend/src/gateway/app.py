@@ -7,10 +7,12 @@ from fastapi import FastAPI
 
 from src.config.app_config import get_app_config
 from src.gateway.config import get_gateway_config
+from src.db.connection import init_db
 from src.gateway.routers import (
     agents,
     artifacts,
     channels,
+    kilocode_models,
     mcp,
     memory,
     models,
@@ -35,11 +37,19 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     # Load config and check necessary environment variables at startup
     try:
-        get_app_config()
+        config = get_app_config()
         logger.info("Configuration loaded successfully")
+        logger.info("Environment: %s", getattr(config, "environment", "unknown"))
     except Exception as e:
-        logger.error(f"Failed to load configuration: {e}")
-        sys.exit(1)
+        logger.exception("Failed to load configuration")
+        raise RuntimeError("Gateway configuration failed during startup") from e
+    
+    # Initialize database
+    try:
+        init_db()
+        logger.info("Database initialized successfully")
+    except Exception as e:
+        logger.warning("Failed to initialize database: %s", e, exc_info=True)
     config = get_gateway_config()
     logger.info(f"Starting API Gateway on {config.host}:{config.port}")
 
@@ -143,6 +153,10 @@ This gateway provides custom endpoints for models, MCP configuration, skills, an
                 "name": "health",
                 "description": "Health check and system status endpoints",
             },
+            {
+                "name": "kilocode",
+                "description": "Kilocode AI Gateway model discovery and management",
+            },
         ],
     )
 
@@ -175,6 +189,9 @@ This gateway provides custom endpoints for models, MCP configuration, skills, an
 
     # Channels API is mounted at /api/channels
     app.include_router(channels.router)
+
+    # Kilocode Models API is mounted at /api/kilocode
+    app.include_router(kilocode_models.router)
 
     @app.get("/health", tags=["health"])
     async def health_check() -> dict:

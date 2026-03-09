@@ -1,0 +1,153 @@
+{
+  "memory_structure": {
+    "home_directory": "~/deer-flow-memory",
+    "tiers": {
+      "hot": {
+        "file": "hot.md",
+        "max_lines": 100,
+        "max_size_kb": 50,
+        "description": "Always loaded, critical patterns"
+      },
+      "corrections": {
+        "file": "corrections.md",
+        "max_entries": 50,
+        "max_size_kb": 100,
+        "description": "Last 50 corrections"
+      },
+      "index": {
+        "file": "index.md",
+        "max_size_kb": 25,
+        "description": "Memory index and statistics"
+      },
+      "warm": {
+        "directories": ["projects", "domains", "templates"],
+        "max_lines_per_file": 200,
+        "max_size_kb_per_file": 100,
+        "description": "Load on demand, context-specific patterns"
+      },
+      "cold": {
+        "directory": "archive",
+        "max_size_mb": 50,
+        "description": "Decayed patterns, unlimited entries"
+      }
+    }
+  },
+  "pattern_detection": {
+    "triggers": {
+      "repetition_threshold": 3,
+      "success_phrases": [
+        "that worked well",
+        "good job",
+        "perfect",
+        "exactly",
+        "that's right"
+      ],
+      "failure_phrases": [
+        "again with",
+        "not this again",
+        "why do you keep",
+        "stop doing",
+        "don't"
+      ],
+      "context_switches": [
+        "in meetings",
+        "working remotely",
+        "at home",
+        "in office",
+        "focused mode"
+      ]
+    },
+    "promotion_rules": {
+      "hot_promotion_threshold": 3,
+      "hot_demotion_threshold": 30,
+      "archive_threshold": 90,
+      "success_boost": 0.5,
+      "failure_penalty": 1.0
+    }
+  },
+  "compression": {
+    "enabled": true,
+    "rules": {
+      "merge_similar_within_days": 7,
+      "auto_summarize_threshold_lines": 10,
+      "create_pattern_families": true,
+      "preserve_attribution": true,
+      "max_file_size_trigger": "90%"
+    },
+    "algorithm": {
+      "similarity_threshold": 0.8,
+      "merge_window_days": 7,
+      "compression_ratio": 0.7
+    }
+  },
+  "context_awareness": {
+    "detection": {
+      "git_repository": true,
+      "file_extensions": true,
+      "working_directory": true,
+      "time_patterns": true,
+      "command_history": true
+    },
+    "mapping": {
+      "git": {
+        "pattern": "^[^.]+",
+        "namespace": "projects/{repo_name}"
+      },
+      "file_extensions": {
+        "ts|js|jsx|tsx": "domains/code",
+        "md|txt|doc": "domains/writing",
+        "py|rb|go": "domains/code",
+        "yml|yaml|json|toml": "domains/config",
+        "dockerfile": "domains/infra"
+      },
+      "directories": {
+        "/docs": "domains/documentation",
+        "/tests": "domains/testing",
+        "/src": "domains/code",
+        "/config": "domains/config"
+      }
+    }
+  },
+  "health_monitoring": {
+    "enabled": true,
+    "metrics": {
+      "hot_tier_utilization": true,
+      "pattern_decay_rate": true,
+      "conflict_detection_score": true,
+      "memory_growth_rate": true,
+      "pattern_effectiveness": true
+    },
+    "thresholds": {
+      "hot_utilization_warning": 80,
+      "hot_utilization_critical": 95,
+      "decay_rate_warning": 0.1,
+      "conflict_score_warning": 0.3,
+      "growth_rate_warning": 0.5
+    },
+    "reporting": {
+      "daily": true,
+      "weekly": true,
+      "monthly": true,
+      "on_demand": true
+    }
+  },
+  "export_system": {
+    "formats": ["json", "markdown", "csv", "zip"],
+    "include_metadata": true,
+    "include_timestamps": true,
+    "include_stats": true,
+    "diff_support": true
+  },
+  "performance": {
+    "lazy_loading": true,
+    "caching": true,
+    "search_indexing": true,
+    "delta_storage": true
+  },
+  "safety": {
+    "backups": true,
+    "corruption_detection": true,
+    "rollback_capabilities": true,
+    "memory_validation": true
+  }
+}

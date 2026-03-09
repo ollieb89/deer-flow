@@ -1,0 +1,23 @@
+{
+  "assertions": [
+    {
+      "type": "final_url_equals",
+      "expected": "https://example.com/",
+      "weight": 1.0
+    },
+    {
+      "type": "status_equals",
+      "expected": "success",
+      "weight": 1.0
+    }
+  ],
+  "rubric": {
+    "task_completion": {
+      "required": true
+    },
+    "efficiency": {
+      "duration_threshold_seconds": 10,
+      "penalty_per_second_over": 0.1
+    }
+  }
+}

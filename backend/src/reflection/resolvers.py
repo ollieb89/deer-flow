@@ -5,6 +5,8 @@ MODULE_TO_PACKAGE_HINTS = {
     "langchain_anthropic": "langchain-anthropic",
     "langchain_openai": "langchain-openai",
     "langchain_deepseek": "langchain-deepseek",
+    "langchain_community": "langchain-community",
+    "langchain_openrouter": "langchain-openrouter",
 }
 
 
