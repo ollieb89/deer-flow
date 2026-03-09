@@ -41,7 +41,7 @@ Use FastAPI's dependency injection for clean, testable code.
 from typing import Annotated
 from fastapi import Depends, FastAPI
 from sqlalchemy.ext.asyncio import AsyncSession
-
+# Assume these are defined in your project:
 # from myapp.database import async_session, oauth2_scheme
 # from myapp.models import User
 # from myapp.services import UserService
@@ -102,7 +102,7 @@ Properly manage async resources like database connections.
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
-# database = Database(DATABASE_URL)
+# database = Database(DATABASE_URL)  # defined elsewhere
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -120,7 +120,7 @@ app = FastAPI(lifespan=lifespan)
 Centralize error handling with custom exception handlers.
 
 ```python
-from fastapi import FastAPI, Request
+from fastapi import Request, FastAPI
 from fastapi.responses import JSONResponse
 
 app = FastAPI()
