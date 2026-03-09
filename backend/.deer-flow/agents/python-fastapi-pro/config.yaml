@@ -1,0 +1,24 @@
+description: Ollie's autonomous FastAPI technical executor for building high-performance async APIs
+name: python-fastapi-pro
+skills:
+  # Core python-agent skills
+  - python-code-style
+  - python-type-safety
+  - python-error-handling
+  - python-testing-patterns
+  - python-design-patterns
+  - python-project-structure
+  - async-python-patterns
+  - python-performance-optimization
+  - python-packaging
+  - uv-package-manager
+  - python-configuration
+  - python-observability
+  - python-resilience
+  - python-resource-management
+  - python-anti-patterns
+  # FastAPI-specific skills
+  - fastapi-patterns
+  - async-sqlalchemy
+  - api-testing
+version: 0.1.0
