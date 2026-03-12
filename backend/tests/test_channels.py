@@ -921,6 +921,64 @@ class TestHandleChatWithArtifacts:
         _run(go())
 
 
+class TestRunTracking:
+    def test_run_registered_and_deregistered(self):
+        """Active run is added to _active_runs during _handle_chat and removed after."""
+        from src.channels.manager import ChannelManager
+
+        async def go():
+            bus = MessageBus()
+            store = ChannelStore(path=Path(tempfile.mkdtemp()) / "store.json")
+            manager = ChannelManager(bus=bus, store=store)
+
+            run_started = asyncio.Event()
+            run_released = asyncio.Event()
+
+            async def slow_wait(*args, **kwargs):
+                run_started.set()
+                await run_released.wait()
+                return {"messages": [{"type": "ai", "content": "done"}]}
+
+            mock_client = _make_mock_langgraph_client()
+            mock_client.runs.wait = slow_wait
+            manager._client = mock_client
+
+            bus.subscribe_outbound(lambda _: None)
+            await manager.start()
+
+            inbound = InboundMessage(channel_name="test", chat_id="c1", user_id="u1", text="hi")
+            await bus.publish_inbound(inbound)
+
+            # Wait for run to start
+            await asyncio.wait_for(run_started.wait(), timeout=5.0)
+
+            # Should have one active run
+            assert len(manager._active_runs) == 1
+
+            # Let the run finish
+            run_released.set()
+            await _wait_for(lambda: len(manager._active_runs) == 0)
+
+            await manager.stop()
+
+        _run(go())
+
+    def test_no_runs_when_idle(self):
+        from src.channels.manager import ChannelManager
+
+        async def go():
+            bus = MessageBus()
+            store = ChannelStore(path=Path(tempfile.mkdtemp()) / "store.json")
+            manager = ChannelManager(bus=bus, store=store)
+            await manager.start()
+
+            assert len(manager._active_runs) == 0
+
+            await manager.stop()
+
+        _run(go())
+
+
 class TestChannelService:
     def test_get_status_no_channels(self):
         from src.channels.service import ChannelService

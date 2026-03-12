@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from dataclasses import dataclass, field
+from datetime import datetime
 
 from src.channels.message_bus import InboundMessage, InboundMessageType, MessageBus, OutboundMessage
 from src.channels.store import ChannelStore
@@ -108,6 +110,16 @@ def _format_artifact_text(artifacts: list[str]) -> str:
     return "Created Files: 📎 " + "、".join(filenames)
 
 
+@dataclass
+class _RunInfo:
+    """Tracks an active LangGraph run for status pings."""
+
+    chat_id: str
+    channel_name: str
+    started_at: datetime = field(default_factory=datetime.now)
+    last_ping_at: datetime | None = None
+
+
 class ChannelManager:
     """Core dispatcher that bridges IM channels to the DeerFlow agent.
 
@@ -136,6 +148,8 @@ class ChannelManager:
         self._semaphore: asyncio.Semaphore | None = None
         self._running = False
         self._task: asyncio.Task | None = None
+        self._active_runs: dict[str, _RunInfo] = {}  # key: f"{channel}:{chat_id}:{topic_id}"
+        self._ticker_task: asyncio.Task | None = None
 
     # -- LangGraph SDK client (lazy) ----------------------------------------
 
@@ -247,18 +261,23 @@ class ChannelManager:
             thread_id = await self._create_thread(client, msg)
 
         logger.info("[Manager] invoking runs.wait(thread_id=%s, text=%r)", thread_id, msg.text[:100])
-        result = await client.runs.wait(
-            thread_id,
-            self._assistant_id,
-            input={"messages": [{"role": "human", "content": msg.text}]},
-            config={"recursion_limit": 100},
-            context={
-                "thread_id": thread_id,
-                "thinking_enabled": True,
-                "is_plan_mode": False,
-                "subagent_enabled": False,
-            },
-        )
+        run_key = f"{msg.channel_name}:{msg.chat_id}:{msg.topic_id or ''}"
+        self._active_runs[run_key] = _RunInfo(chat_id=msg.chat_id, channel_name=msg.channel_name)
+        try:
+            result = await client.runs.wait(
+                thread_id,
+                self._assistant_id,
+                input={"messages": [{"role": "human", "content": msg.text}]},
+                config={"recursion_limit": 100},
+                context={
+                    "thread_id": thread_id,
+                    "thinking_enabled": True,
+                    "is_plan_mode": False,
+                    "subagent_enabled": False,
+                },
+            )
+        finally:
+            self._active_runs.pop(run_key, None)
 
         response_text = _extract_response_text(result)
         artifacts = _extract_artifacts(result)
