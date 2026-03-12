@@ -403,7 +403,7 @@ class TestChannelManager:
 
             inbound = InboundMessage(channel_name="test", chat_id="chat1", user_id="user1", text="hi")
             await bus.publish_inbound(inbound)
-            await _wait_for(lambda: len(outbound_received) >= 1)
+            await _wait_for(lambda: len(outbound_received) >= 2)
             await manager.stop()
 
             # Thread should be created on the LangGraph Server
@@ -420,8 +420,9 @@ class TestChannelManager:
             assert call_args[0][1] == "lead_agent"  # assistant_id
             assert call_args[1]["input"]["messages"][0]["content"] == "hi"
 
-            assert len(outbound_received) == 1
-            assert outbound_received[0].text == "Hello from agent!"
+            assert len(outbound_received) == 2
+            assert "✅" in outbound_received[0].text
+            assert outbound_received[1].text == "Hello from agent!"
 
         _run(go())
 
@@ -781,13 +782,13 @@ class TestHandleChatWithArtifacts:
                     text="generate report",
                 )
             )
-            await _wait_for(lambda: len(outbound_received) >= 1)
+            await _wait_for(lambda: len(outbound_received) >= 2)
             await manager.stop()
 
-            assert len(outbound_received) == 1
-            assert "Here is your report." in outbound_received[0].text
-            assert "report.md" in outbound_received[0].text
-            assert outbound_received[0].artifacts == ["/mnt/user-data/outputs/report.md"]
+            assert len(outbound_received) == 2
+            assert "Here is your report." in outbound_received[1].text
+            assert "report.md" in outbound_received[1].text
+            assert outbound_received[1].artifacts == ["/mnt/user-data/outputs/report.md"]
 
         _run(go())
 
@@ -828,14 +829,14 @@ class TestHandleChatWithArtifacts:
                     text="export data",
                 )
             )
-            await _wait_for(lambda: len(outbound_received) >= 1)
+            await _wait_for(lambda: len(outbound_received) >= 2)
             await manager.stop()
 
-            assert len(outbound_received) == 1
+            assert len(outbound_received) == 2
             # Should NOT be the "(No response from agent)" fallback
-            assert outbound_received[0].text != "(No response from agent)"
-            assert "output.csv" in outbound_received[0].text
-            assert outbound_received[0].artifacts == ["/mnt/user-data/outputs/output.csv"]
+            assert outbound_received[1].text != "(No response from agent)"
+            assert "output.csv" in outbound_received[1].text
+            assert outbound_received[1].artifacts == ["/mnt/user-data/outputs/output.csv"]
 
         _run(go())
 
@@ -905,19 +906,19 @@ class TestHandleChatWithArtifacts:
                 )
                 await bus.publish_inbound(msg)
 
-            await _wait_for(lambda: len(outbound_received) >= 2)
+            await _wait_for(lambda: len(outbound_received) >= 4)
             await manager.stop()
 
-            assert len(outbound_received) == 2
+            assert len(outbound_received) == 4
 
-            # Turn 1: should include report.md
-            assert "report.md" in outbound_received[0].text
-            assert outbound_received[0].artifacts == ["/mnt/user-data/outputs/report.md"]
+            # Turn 1: prefix at [0], response at [1]
+            assert "report.md" in outbound_received[1].text
+            assert outbound_received[1].artifacts == ["/mnt/user-data/outputs/report.md"]
 
-            # Turn 2: should include ONLY chart.png (report.md is from previous turn)
-            assert "chart.png" in outbound_received[1].text
-            assert "report.md" not in outbound_received[1].text
-            assert outbound_received[1].artifacts == ["/mnt/user-data/outputs/chart.png"]
+            # Turn 2: prefix at [2], response at [3]
+            assert "chart.png" in outbound_received[3].text
+            assert "report.md" not in outbound_received[3].text
+            assert outbound_received[3].artifacts == ["/mnt/user-data/outputs/chart.png"]
 
         _run(go())
 
@@ -976,6 +977,39 @@ class TestRunTracking:
             assert len(manager._active_runs) == 0
 
             await manager.stop()
+
+        _run(go())
+
+
+class TestCompletionPrefix:
+    def test_completion_prefix_sent_before_response(self):
+        """A '✅ Done' message is published before the agent response."""
+        from src.channels.manager import ChannelManager
+
+        async def go():
+            bus = MessageBus()
+            store = ChannelStore(path=Path(tempfile.mkdtemp()) / "store.json")
+            manager = ChannelManager(bus=bus, store=store)
+
+            mock_client = _make_mock_langgraph_client()
+            manager._client = mock_client
+
+            outbound_received = []
+            bus.subscribe_outbound(lambda msg: outbound_received.append(msg))
+            await manager.start()
+
+            await bus.publish_inbound(
+                InboundMessage(channel_name="test", chat_id="c1", user_id="u1", text="do something")
+            )
+            await _wait_for(lambda: len(outbound_received) >= 2)
+            await manager.stop()
+
+            # First message is the completion prefix
+            assert "✅" in outbound_received[0].text
+            assert "done" in outbound_received[0].text.lower()
+
+            # Second message is the actual agent response
+            assert outbound_received[1].text == "Hello from agent!"
 
         _run(go())
 

@@ -313,6 +313,16 @@ class ChannelManager:
         finally:
             self._active_runs.pop(run_key, None)
 
+        # Publish completion prefix before the agent response
+        done_msg = OutboundMessage(
+            channel_name=msg.channel_name,
+            chat_id=msg.chat_id,
+            thread_id=thread_id,
+            text="✅ Done — here's the result:",
+            thread_ts=msg.thread_ts,
+        )
+        await self.bus.publish_outbound(done_msg)
+
         response_text = _extract_response_text(result)
         artifacts = _extract_artifacts(result)
 
