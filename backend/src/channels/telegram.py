@@ -129,20 +129,22 @@ class TelegramChannel(Channel):
 
     # -- helpers -----------------------------------------------------------
 
-    async def _send_running_reply(self, chat_id: str, reply_to_message_id: int) -> None:
-        """Send a 'Working on it...' reply to the user's message."""
+    async def _send_running_reaction(self, chat_id: str, message_id: int) -> None:
+        """React with ❤️ to the user's message to indicate processing."""
         if not self._application:
             return
         try:
+            from telegram import ReactionTypeEmoji
+
             bot = self._application.bot
-            await bot.send_message(
+            await bot.set_message_reaction(
                 chat_id=int(chat_id),
-                text="Working on it...",
-                reply_to_message_id=reply_to_message_id,
+                message_id=message_id,
+                reaction=[ReactionTypeEmoji(emoji="❤")],
             )
-            logger.info("[Telegram] 'Working on it...' reply sent in chat=%s", chat_id)
+            logger.info("[Telegram] ❤️ reaction sent in chat=%s msg=%s", chat_id, message_id)
         except Exception:
-            logger.exception("[Telegram] failed to send running reply in chat=%s", chat_id)
+            logger.debug("[Telegram] reaction not supported in chat=%s, skipping", chat_id)
 
     # -- internal ----------------------------------------------------------
 
@@ -151,7 +153,11 @@ class TelegramChannel(Channel):
         self._tg_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(self._tg_loop)
         try:
-            self._tg_loop.run_until_complete(self._application.run_polling(close_loop=False))
+            # Disable signal handlers since we're not in the main thread
+            # This prevents "set_wakeup_fd only works in main thread" error
+            self._tg_loop.run_until_complete(
+                self._application.run_polling(close_loop=False, stop_signals=None)
+            )
         except Exception:
             if self._running:
                 logger.exception("Telegram polling error")
@@ -186,7 +192,7 @@ class TelegramChannel(Channel):
         )
 
         if self._main_loop and self._main_loop.is_running():
-            asyncio.run_coroutine_threadsafe(self._send_running_reply(chat_id, update.message.message_id), self._main_loop)
+            asyncio.run_coroutine_threadsafe(self._send_running_reaction(chat_id, update.message.message_id), self._main_loop)
             asyncio.run_coroutine_threadsafe(self.bus.publish_inbound(inbound), self._main_loop)
 
     async def _on_text(self, update, context) -> None:
@@ -221,5 +227,5 @@ class TelegramChannel(Channel):
         inbound.topic_id = topic_id
 
         if self._main_loop and self._main_loop.is_running():
-            asyncio.run_coroutine_threadsafe(self._send_running_reply(chat_id, update.message.message_id), self._main_loop)
+            asyncio.run_coroutine_threadsafe(self._send_running_reaction(chat_id, update.message.message_id), self._main_loop)
             asyncio.run_coroutine_threadsafe(self.bus.publish_inbound(inbound), self._main_loop)

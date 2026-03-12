@@ -1008,6 +1008,55 @@ class TestSlackSendRetry:
 
 
 # ---------------------------------------------------------------------------
+# Telegram reaction tests
+# ---------------------------------------------------------------------------
+
+
+class TestTelegramReaction:
+    def test_running_reaction_calls_set_message_reaction(self):
+        from src.channels.telegram import TelegramChannel
+
+        async def go():
+            bus = MessageBus()
+            ch = TelegramChannel(bus=bus, config={"bot_token": "test-token"})
+
+            mock_app = MagicMock()
+            mock_bot = AsyncMock()
+            mock_bot.set_message_reaction = AsyncMock(return_value=None)
+            mock_app.bot = mock_bot
+            ch._application = mock_app
+
+            await ch._send_running_reaction("12345", 42)
+
+            mock_bot.set_message_reaction.assert_called_once()
+            call_kwargs = mock_bot.set_message_reaction.call_args[1]
+            assert call_kwargs["chat_id"] == 12345
+            assert call_kwargs["message_id"] == 42
+            # Must not send a text message
+            mock_bot.send_message.assert_not_called()
+
+        _run(go())
+
+    def test_running_reaction_silently_ignores_errors(self):
+        from src.channels.telegram import TelegramChannel
+
+        async def go():
+            bus = MessageBus()
+            ch = TelegramChannel(bus=bus, config={"bot_token": "test-token"})
+
+            mock_app = MagicMock()
+            mock_bot = AsyncMock()
+            mock_bot.set_message_reaction = AsyncMock(side_effect=Exception("reactions not supported"))
+            mock_app.bot = mock_bot
+            ch._application = mock_app
+
+            # Should not raise
+            await ch._send_running_reaction("12345", 42)
+
+        _run(go())
+
+
+# ---------------------------------------------------------------------------
 # Telegram send retry tests
 # ---------------------------------------------------------------------------
 
