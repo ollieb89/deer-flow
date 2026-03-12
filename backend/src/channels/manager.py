@@ -137,6 +137,7 @@ class ChannelManager:
         langgraph_url: str = DEFAULT_LANGGRAPH_URL,
         gateway_url: str = DEFAULT_GATEWAY_URL,
         assistant_id: str = DEFAULT_ASSISTANT_ID,
+        status_ping_interval_seconds: float = 60.0,
     ) -> None:
         self.bus = bus
         self.store = store
@@ -148,8 +149,10 @@ class ChannelManager:
         self._semaphore: asyncio.Semaphore | None = None
         self._running = False
         self._task: asyncio.Task | None = None
-        self._active_runs: dict[str, _RunInfo] = {}  # key: f"{channel}:{chat_id}:{topic_id}"
+        self._active_runs: dict[str, _RunInfo] = {}  # key: f"{channel}:{chat_id}:{thread_id}"
         self._ticker_task: asyncio.Task | None = None
+        self._status_ping_interval = status_ping_interval_seconds
+        self._status_ping_threshold = 15 * 60  # 15 minutes in seconds
 
     # -- LangGraph SDK client (lazy) ----------------------------------------
 
@@ -170,18 +173,21 @@ class ChannelManager:
         self._running = True
         self._semaphore = asyncio.Semaphore(self._max_concurrency)
         self._task = asyncio.create_task(self._dispatch_loop())
+        self._ticker_task = asyncio.create_task(self._status_ticker())
         logger.info("ChannelManager started (max_concurrency=%d)", self._max_concurrency)
 
     async def stop(self) -> None:
         """Stop the dispatch loop."""
         self._running = False
-        if self._task:
-            self._task.cancel()
-            try:
-                await self._task
-            except asyncio.CancelledError:
-                pass
-            self._task = None
+        for task in (self._task, self._ticker_task):
+            if task:
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
+        self._task = None
+        self._ticker_task = None
         logger.info("ChannelManager stopped")
 
     # -- dispatch loop -----------------------------------------------------
@@ -205,6 +211,31 @@ class ChannelManager:
             )
             task = asyncio.create_task(self._handle_message(msg))
             task.add_done_callback(self._log_task_error)
+
+    async def _status_ticker(self) -> None:
+        """Background task that pings chats with long-running jobs every 15 minutes."""
+        while self._running:
+            try:
+                await asyncio.sleep(self._status_ping_interval)
+            except asyncio.CancelledError:
+                break
+
+            now = datetime.now()
+            for run_key, info in list(self._active_runs.items()):
+                elapsed_seconds = (now - info.started_at).total_seconds()
+                since_last_ping = (now - info.last_ping_at).total_seconds() if info.last_ping_at else elapsed_seconds
+
+                if elapsed_seconds >= self._status_ping_threshold and since_last_ping >= self._status_ping_threshold:
+                    elapsed_min = int(elapsed_seconds / 60)
+                    ping = OutboundMessage(
+                        channel_name=info.channel_name,
+                        chat_id=info.chat_id,
+                        thread_id="",
+                        text=f"⚙️ Still working — {elapsed_min}m elapsed.",
+                    )
+                    await self.bus.publish_outbound(ping)
+                    info.last_ping_at = now
+                    logger.info("[Manager] status ping sent to chat=%s (%dm elapsed)", info.chat_id, elapsed_min)
 
     @staticmethod
     def _log_task_error(task: asyncio.Task) -> None:
@@ -261,7 +292,7 @@ class ChannelManager:
             thread_id = await self._create_thread(client, msg)
 
         logger.info("[Manager] invoking runs.wait(thread_id=%s, text=%r)", thread_id, msg.text[:100])
-        run_key = f"{msg.channel_name}:{msg.chat_id}:{msg.topic_id or ''}"
+        run_key = f"{msg.channel_name}:{msg.chat_id}:{thread_id}"
         self._active_runs[run_key] = _RunInfo(chat_id=msg.chat_id, channel_name=msg.channel_name)
         try:
             result = await client.runs.wait(

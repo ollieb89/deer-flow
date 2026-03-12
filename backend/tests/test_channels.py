@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import tempfile
+from datetime import datetime
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock
 
@@ -975,6 +976,109 @@ class TestRunTracking:
             assert len(manager._active_runs) == 0
 
             await manager.stop()
+
+        _run(go())
+
+
+class TestStatusTicker:
+    def test_ticker_pings_when_run_exceeds_threshold(self):
+        """Ticker sends a status ping when a run has been active past the threshold."""
+        from src.channels.manager import ChannelManager, _RunInfo
+
+        async def go():
+            from datetime import timedelta
+
+            bus = MessageBus()
+            store = ChannelStore(path=Path(tempfile.mkdtemp()) / "store.json")
+            manager = ChannelManager(bus=bus, store=store, status_ping_interval_seconds=0.1)
+
+            outbound_received = []
+            bus.subscribe_outbound(lambda msg: outbound_received.append(msg))
+
+            await manager.start()
+
+            # Manually inject an "old" active run (started 20 minutes ago)
+            old_start = datetime.now() - timedelta(minutes=20)
+            manager._active_runs["test:chat1:thread-x"] = _RunInfo(
+                chat_id="chat1",
+                channel_name="test",
+                started_at=old_start,
+                last_ping_at=None,
+            )
+
+            # Wait for the ticker to fire
+            await _wait_for(lambda: len(outbound_received) >= 1, timeout=3.0)
+            await manager.stop()
+
+            assert len(outbound_received) >= 1
+            msg = outbound_received[0]
+            assert msg.chat_id == "chat1"
+            assert msg.channel_name == "test"
+            assert "⚙️" in msg.text
+            assert "working" in msg.text.lower() or "min" in msg.text.lower()
+
+        _run(go())
+
+    def test_ticker_does_not_ping_for_new_runs(self):
+        """Ticker skips runs that started less than 15 minutes ago."""
+        from src.channels.manager import ChannelManager, _RunInfo
+
+        async def go():
+            bus = MessageBus()
+            store = ChannelStore(path=Path(tempfile.mkdtemp()) / "store.json")
+            manager = ChannelManager(bus=bus, store=store, status_ping_interval_seconds=0.05)
+
+            outbound_received = []
+            bus.subscribe_outbound(lambda msg: outbound_received.append(msg))
+
+            await manager.start()
+
+            # Inject a fresh run (just started)
+            manager._active_runs["test:chat1:thread-y"] = _RunInfo(
+                chat_id="chat1",
+                channel_name="test",
+            )
+
+            # Wait a bit — ticker should fire but not ping (run is too new)
+            await asyncio.sleep(0.2)
+            await manager.stop()
+
+            assert len(outbound_received) == 0
+
+        _run(go())
+
+    def test_ticker_respects_15min_cooldown_between_pings(self):
+        """Once pinged, ticker should not ping again for 15 minutes."""
+        from src.channels.manager import ChannelManager, _RunInfo
+
+        async def go():
+            from datetime import timedelta
+
+            bus = MessageBus()
+            store = ChannelStore(path=Path(tempfile.mkdtemp()) / "store.json")
+            manager = ChannelManager(bus=bus, store=store, status_ping_interval_seconds=0.05)
+
+            outbound_received = []
+            bus.subscribe_outbound(lambda msg: outbound_received.append(msg))
+
+            await manager.start()
+
+            # Inject old run that was pinged 5 minutes ago (not 15 yet)
+            old_start = datetime.now() - timedelta(minutes=20)
+            recent_ping = datetime.now() - timedelta(minutes=5)
+            manager._active_runs["test:chat1:thread-z"] = _RunInfo(
+                chat_id="chat1",
+                channel_name="test",
+                started_at=old_start,
+                last_ping_at=recent_ping,
+            )
+
+            # Wait for multiple ticker cycles
+            await asyncio.sleep(0.3)
+            await manager.stop()
+
+            # Should not have pinged (cooldown not expired)
+            assert len(outbound_received) == 0
 
         _run(go())
 
