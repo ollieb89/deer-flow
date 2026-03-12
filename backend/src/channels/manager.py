@@ -233,9 +233,12 @@ class ChannelManager:
                         thread_id="",
                         text=f"⚙️ Still working — {elapsed_min}m elapsed.",
                     )
-                    await self.bus.publish_outbound(ping)
-                    info.last_ping_at = now
-                    logger.info("[Manager] status ping sent to chat=%s (%dm elapsed)", info.chat_id, elapsed_min)
+                    try:
+                        await self.bus.publish_outbound(ping)
+                        info.last_ping_at = now
+                        logger.info("[Manager] status ping sent to chat=%s (%dm elapsed)", info.chat_id, elapsed_min)
+                    except Exception:
+                        logger.exception("[Manager] failed to send status ping to chat=%s", info.chat_id)
 
     @staticmethod
     def _log_task_error(task: asyncio.Task) -> None:
