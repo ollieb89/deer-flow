@@ -313,16 +313,6 @@ class ChannelManager:
         finally:
             self._active_runs.pop(run_key, None)
 
-        # Publish completion prefix before the agent response
-        done_msg = OutboundMessage(
-            channel_name=msg.channel_name,
-            chat_id=msg.chat_id,
-            thread_id=thread_id,
-            text="✅ Done — here's the result:",
-            thread_ts=msg.thread_ts,
-        )
-        await self.bus.publish_outbound(done_msg)
-
         response_text = _extract_response_text(result)
         artifacts = _extract_artifacts(result)
 
@@ -340,6 +330,18 @@ class ChannelManager:
                 response_text = response_text + "\n\n" + artifact_text
             else:
                 response_text = artifact_text
+
+        # Only send the completion prefix when there is genuine content
+        has_content = bool(response_text)
+        if has_content:
+            done_msg = OutboundMessage(
+                channel_name=msg.channel_name,
+                chat_id=msg.chat_id,
+                thread_id=thread_id,
+                text="✅ Done — here's the result:",
+                thread_ts=msg.thread_ts,
+            )
+            await self.bus.publish_outbound(done_msg)
 
         if not response_text:
             response_text = "(No response from agent)"

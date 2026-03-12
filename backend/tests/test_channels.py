@@ -1013,6 +1013,39 @@ class TestCompletionPrefix:
 
         _run(go())
 
+    def test_no_prefix_when_no_response(self):
+        """Completion prefix is NOT sent when agent produces no meaningful response."""
+        from src.channels.manager import ChannelManager
+
+        async def go():
+            bus = MessageBus()
+            store = ChannelStore(path=Path(tempfile.mkdtemp()) / "store.json")
+            manager = ChannelManager(bus=bus, store=store)
+
+            # Mock that returns no content
+            empty_result = {"messages": [{"type": "ai", "content": ""}]}
+            mock_client = _make_mock_langgraph_client(run_result=empty_result)
+            manager._client = mock_client
+
+            outbound_received = []
+            bus.subscribe_outbound(lambda msg: outbound_received.append(msg))
+            await manager.start()
+
+            await bus.publish_inbound(
+                InboundMessage(channel_name="test", chat_id="c1", user_id="u1", text="do something")
+            )
+            await _wait_for(lambda: len(outbound_received) >= 1)
+            # Give a moment to ensure no second message arrives
+            await asyncio.sleep(0.1)
+            await manager.stop()
+
+            # Only one message: the fallback, no prefix
+            assert len(outbound_received) == 1
+            assert "✅" not in outbound_received[0].text
+            assert "No response" in outbound_received[0].text
+
+        _run(go())
+
 
 class TestStatusTicker:
     def test_ticker_pings_when_run_exceeds_threshold(self):
